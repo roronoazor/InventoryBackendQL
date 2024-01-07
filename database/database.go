@@ -1,8 +1,10 @@
-package config
+package database
 
 import (
 	"context"
+	"log"
 
+	config "github.com/roronoazor/InventoryBackendQL/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -13,23 +15,15 @@ type MongoInstance struct {
 	Db     *mongo.Database
 }
 
-var mg MongoInstance
-
-// Database settings (insert your own database name and connection URI)
-const dbName = "fiber_test"
-const mongoURI = "mongodb://user:password@localhost:27017/" + dbName
-
-// Employee struct
-type Employee struct {
-	ID     string  `json:"id,omitempty" bson:"_id,omitempty"`
-	Name   string  `json:"name"`
-	Salary float64 `json:"salary"`
-	Age    float64 `json:"age"`
-}
+var MongoDbInstance MongoInstance
 
 // Connect configures the MongoDB client and initializes the database connection.
 // Source: https://www.mongodb.com/docs/drivers/go/current/quick-start/
 func Connect() error {
+
+	dbName := config.Config("DB_NAME")
+	mongoURI := config.Config("MONGO_URI")
+
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoURI))
 
 	if err != nil {
@@ -48,10 +42,11 @@ func Connect() error {
 		return err
 	}
 
-	mg = MongoInstance{
+	MongoDbInstance = MongoInstance{
 		Client: client,
 		Db:     db,
 	}
 
+	log.Println("Connected Successfully")
 	return nil
 }

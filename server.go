@@ -1,13 +1,23 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"log"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/roronoazor/InventoryBackendQL/database"
+)
 
 func main() {
-	app := fiber.New()
+	log.Println("Loading Server")
+	// Connect to the database
+	if err := database.Connect(); err != nil {
+		log.Fatal(err)
+	}
 
+	app := fiber.New()
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 
-	app.Listen(":8000")
+	log.Fatal(app.Listen(":8000"))
 }
